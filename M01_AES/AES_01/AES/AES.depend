@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1524276231 source:c:\users\kyu\desktop\nsr_professional-manpower\m01_aes\aes_01\aes\main.c
+	<stdio.h>
+	<stdlib.h>
+
