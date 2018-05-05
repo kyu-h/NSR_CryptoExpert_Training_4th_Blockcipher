@@ -1,6 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MUL2(a)    (a << 1) ^ (a & 0x80 ? 0x1b : 0)
+#define MUL3(a)    MUL2(a) ^ a
+#define MUL4(a)    MUL2( MUL2(a) )
+#define MUL8(a)    MUL2( MUL2( MUL2(a)))
+#define MUL9(a)    MUL8(a) ^ a
+#define MULB(a)    MUL8(a) ^ MUL2(a) ^ a
+#define MULD(a)    MUL8(a) ^ MUL4(a) ^ a
+#define MULE(a)    MUL8(a) ^ MUL4(a) ^ MUL2(a)
+
 void statePrint(unsigned char state[0x04][0x04]){
     int i,j;
 
@@ -66,6 +75,85 @@ void subBytes(unsigned char state[0x04][0x04], unsigned char S_BOX[0x16][0x16]){
     statePrint(state);
 }
 
+void Inverse_Mixcolumn(unsigned char state[0x04][0x04]){
+    unsigned char tmp[0x16];
+    unsigned char block[0x16];
+    const int row = 4;
+
+    for(int i=0; i<4; i++){ //2차원 배열 -> 1차원
+        for(int j=0; j<4; j++){
+            block[row * i + j] = state[i][j];
+        }
+    }
+
+    tmp[ 0] = MULE(block[0]) ^ MULB(block[1]) ^ MULD(block[2]) ^ MUL9(block[3]) ;
+    tmp[ 1] = MUL9(block[0]) ^ MULE(block[1]) ^ MULB(block[2]) ^ MULD(block[3]) ;
+    tmp[ 2] = MULD(block[0]) ^ MUL9(block[1]) ^ MULE(block[2]) ^ MULB(block[3]) ;
+    tmp[ 3] = MULB(block[0]) ^ MULD(block[1]) ^ MUL9(block[2]) ^ MULE(block[3]) ;
+
+    tmp[ 4] = MULE(block[4]) ^ MULB(block[5]) ^ MULD(block[6]) ^ MUL9(block[7]) ;
+    tmp[ 5] = MUL9(block[4]) ^ MULE(block[5]) ^ MULB(block[6]) ^ MULD(block[7]) ;
+    tmp[ 6] = MULD(block[4]) ^ MUL9(block[5]) ^ MULE(block[6]) ^ MULB(block[7]) ;
+    tmp[ 7] = MULB(block[4]) ^ MULD(block[5]) ^ MUL9(block[6]) ^ MULE(block[7]) ;
+
+    tmp[ 8] = MULE(block[8]) ^ MULB(block[9]) ^ MULD(block[10]) ^ MUL9(block[11]) ;
+    tmp[ 9] = MUL9(block[8]) ^ MULE(block[9]) ^ MULB(block[10]) ^ MULD(block[11]) ;
+    tmp[10] = MULD(block[8]) ^ MUL9(block[9]) ^ MULE(block[10]) ^ MULB(block[11]) ;
+    tmp[11] = MULB(block[8]) ^ MULD(block[9]) ^ MUL9(block[10]) ^ MULE(block[11]) ;
+
+    tmp[12] = MULE(block[12]) ^ MULB(block[13]) ^ MULD(block[14]) ^ MUL9(block[15]) ;
+    tmp[13] = MUL9(block[12]) ^ MULE(block[13]) ^ MULB(block[14]) ^ MULD(block[15]) ;
+    tmp[14] = MULD(block[12]) ^ MUL9(block[13]) ^ MULE(block[14]) ^ MULB(block[15]) ;
+    tmp[15] = MULB(block[12]) ^ MULD(block[13]) ^ MUL9(block[14]) ^ MULE(block[15]) ;
+
+    for(int i=0; i<4; i++){ //1차원 배열 -> 2차원
+        for(int j=0; j<4; j++){
+             state[i][j] = tmp[row * i + j];
+        }
+    }
+}
+
+void MixColumn(unsigned char state[0x04][0x04]){
+    unsigned char tmp[0x16];
+    unsigned char block[0x16];
+    const int row = 4;
+
+    for(int i=0; i<4; i++){ //2차원 배열 -> 1차원
+        for(int j=0; j<4; j++){
+            block[row * i + j] = state[i][j];
+        }
+    }
+
+    tmp[0] = MUL2(block[0]) ^ MUL3(block[1]) ^ block[2] ^ block[3];
+    tmp[1] = block[0] ^ MUL2(block[1]) ^ MUL3(block[2]) ^ block[3];
+    tmp[2] = block[0] ^ block[1] ^ MUL2(block[2]) ^ MUL3(block[3]);
+    tmp[3] = MUL3(block[0]) ^ block[1] ^ block[2] ^ MUL2(block[3]);
+
+    tmp[4] = MUL2(block[4]) ^ MUL3(block[5]) ^ block[6] ^ block[7];
+    tmp[5] = block[4] ^ MUL2(block[5]) ^ MUL3(block[6]) ^ block[7];
+    tmp[6] = block[4] ^ block[5] ^ MUL2(block[6]) ^ MUL3(block[7]);
+    tmp[7] = MUL3(block[4]) ^ block[5] ^ block[6] ^ MUL2(block[7]);
+
+    tmp[8] = MUL2(block[8]) ^ MUL3(block[9]) ^ block[10] ^ block[11];
+    tmp[9] = block[8] ^ MUL2(block[9]) ^ MUL3(block[10]) ^ block[11];
+    tmp[10] = block[8] ^ block[9] ^ MUL2(block[10]) ^ MUL3(block[11]);
+    tmp[11] = MUL3(block[8]) ^ block[9] ^ block[10] ^ MUL2(block[11]);
+
+    tmp[12] = MUL2(block[12]) ^ MUL3(block[13]) ^ block[14] ^ block[15];
+    tmp[13] = block[12] ^ MUL2(block[13]) ^ MUL3(block[14]) ^ block[15];
+    tmp[14] = block[12] ^ block[13] ^ MUL2(block[14]) ^ MUL3(block[15]);
+    tmp[15] = MUL3(block[12]) ^ block[13] ^ block[14] ^ MUL2(block[15]);
+
+    for(int i=0; i<4; i++){ //1차원 배열 -> 2차원
+        for(int j=0; j<4; j++){
+             state[i][j] = tmp[row * i + j];
+        }
+    }
+
+    statePrint(state);
+}
+
+
 void MixColumns(unsigned char state[0x04][0x04]){
     unsigned char a[0x04], b[0x04], h;
     int i,j;
@@ -122,11 +210,18 @@ int main()
         addRoundKey(state);
         shiftRows(state);
         subBytes(state, S_BOX);
-        MixColumns(state);
+        MixColumn(state);
         printf("\n");
     }
     addRoundKey(state);
 
+
+    printf("---------------------------\n");
+    statePrint(state);
+    MixColumns(state);
+    statePrint(state);
+    Inverse_Mixcolumn(state);
+    statePrint(state);
 
     return 0;
 }
