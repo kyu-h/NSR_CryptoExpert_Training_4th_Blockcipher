@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1346333666 source:c:\users\kyu\desktop\nsr_professional_manpower_4th_blockcipher\m02_des\des_original\des\main.c
+	<stdio.h>
+	"des.h"
+
+1346294468 c:\users\kyu\desktop\nsr_professional_manpower_4th_blockcipher\m02_des\des_original\des\des.h
+
