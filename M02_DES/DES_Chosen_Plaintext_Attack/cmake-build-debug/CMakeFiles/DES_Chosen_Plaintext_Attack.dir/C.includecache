@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/kyu/Desktop/NSR_Professional_Manpower_4th_Blockcipher/M02_DES/DES_Chosen_Plaintext_Attack/main.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+
