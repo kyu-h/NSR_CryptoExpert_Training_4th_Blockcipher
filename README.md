@@ -3,4 +3,4 @@
 <hr>
 OS: Window
 Compiler: MinGW
-IDE: Eclipse or CLion or CodeBlocks(Only for main code test)
+IDE: Eclipse or CLion or CodeBlocks(Only for simple main code test)
